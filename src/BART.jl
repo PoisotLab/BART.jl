@@ -15,7 +15,10 @@ include("trees.jl")
 include("models.jl")
 include("proposals.jl")
 include("predict.jl")
-include("fit.jl")
+
+include("fit/binary.jl")
+include("fit/continuous.jl")
+include("fit/survival.jl")
 
 export
     BartModel,

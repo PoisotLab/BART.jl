@@ -358,31 +358,6 @@ function varcounts(trees::Vector{BartTree}, bm::BartModel)
     return vec(sum(reduce(hcat, [varcount(bt.tree, bm) for bt in trees]); dims = 2))
 end
 
-# function rlgam(shape)
-#   if shape >= 0.1
-#     return log(rand(Gamma(shape, 1)))
-#   else
-#     a = shape
-#     L = 1.0/a- 1.0;
-#     w = exp(-1.0) * a / (1.0 - a)
-#     ww = 1.0 / (1.0 + w)
-#     z = 0.0
-#     cond = true
-#     while cond
-#       U = rand()
-#       if (U <= ww)
-#         z = -log(U / ww);
-#       else
-#         z = log(rand()) / L
-#       end
-#       eta = z >= 0 ? -z : log(w)  + log(L) + L * z
-#       h = -z - exp(-z / a);
-#       cond = h - eta > log(rand())
-#     end
-#     return -z/a
-#   end
-# end
-
 function log_sum_exp(x)
     m = maximum(x)
     return m + log(sum(exp.(x .- m)))
@@ -390,12 +365,7 @@ end
 
 function draws!(bs::BartState, bm::BartModel)
     vc = varcounts(bs.ensemble.trees, bm)
-    # gc = [sum(counts[findall(bm.hypers.group_idx .== g)]) for g in bm.hypers.groups]
     shapes = bs.shape / bm.td.p .+ vc
-    # bs.s = rand(Dirichlet(shapes))
-    # logs = rlgam.(shapes)
-    # logs = logs .- log_sum_exp(logs)
-    # bs.s = exp.(logs)
     y = log.(rand.(Gamma.(shapes .+ 1, 1)))
     z = log.(rand(length(shapes))) ./ shapes
     logs = y + z
@@ -416,7 +386,6 @@ function drawα!(bs::BartState, bm::BartModel)
     prob = exp.(lωg .- lse)
     new_ω = sample(grid, weights(prob))
     return bs.shape = (new_ω / (1 - new_ω)) * bm.td.p
-    # bs.shape = bm.hypers.shape
 end
 
 ## Log tree posterior: continuous respose
@@ -438,15 +407,6 @@ function ptd(bc::RegBartChain)
     c = [[bc.bm, treedraws[l], σdraws[l], bc.bm.td.y] for l in 1:S]
     return pmap(ptd, c)
 end
-
-## Log tree posterior: binary response
-# function log_tree_post(bc::ProbitBartChain)
-#   S = size(bc.treedraws, 1)*size(bc.treedraws, 3)
-#   treedraws = reshape(bc.treedraws, S)
-#   zdraws = reshape(bc.zdraws, bc.bm.td.n, S)
-#   c = [[bc.bm, treedraws[l], 1.0, zdraws[:,l]] for l in 1:S]
-#   pmap(log_tree_post, c)
-# end
 
 function _ptd(c)
     trees, bm = c

@@ -1,14 +1,6 @@
-###############################################################################
-##### Predict functions
-###############################################################################
+getμ(tree::Tree) = [leaf.μ for leaf in leafnodes(tree.root)]
 
-function getμ(tree::Tree)
-    return [leaf.μ for leaf in leafnodes(tree.root)]
-end
-
-function StatsBase.predict(bt::BartTree)
-    return bt.S * getμ(bt.tree)
-end
+StatsBase.predict(bt::BartTree) = bt.S * getμ(bt.tree)
 
 function StatsBase.predict(bs::BartState, bm::BartModel)
     fhat = zeros(bm.td.n)

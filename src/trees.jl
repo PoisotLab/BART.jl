@@ -32,9 +32,7 @@ function leafnodes(node::Node)
     end
 end
 
-function Base.parent(node::Node, tree::Tree)
-    return parent(node, tree.root)
-end
+Base.parent(node::Node, tree::Tree) = parent(node, tree.root)
 
 function Base.parent(node::Node, child_node::Branch)
     if (child_node.left == node) || (child_node.right == node)
@@ -48,9 +46,7 @@ function Base.parent(node::Node, child_node::Branch)
     end
 end
 
-function Base.parent(node::Node, child_node::Leaf)
-    return nothing
-end
+Base.parent(::Node, ::Leaf) = nothing    
 
 function onlyparents(tree::Tree)
     branches = Branch[]
@@ -71,15 +67,13 @@ function onlyparents(branch::Branch, branches::Vector{Branch})
     return branches
 end
 
-onlyparents(leaf::Leaf, branches::Vector{Branch}) = nothing
+onlyparents(::Leaf, ::Vector{Branch}) = nothing
 
 function depth(node::Node, tree::Tree)
     return tree.root == node ? 0 : 1 + depth(parent(node, tree), tree)
 end
 
-function depth(tree)
-    return maximum([depth(leaf, tree) for leaf in leafnodes(tree.root)])
-end
+depth(tree::Tree) = maximum([depth(leaf, tree) for leaf in leafnodes(tree.root)])
 
 function isleft(node::Node, tree::Tree)
     parentnode = parent(node, tree)

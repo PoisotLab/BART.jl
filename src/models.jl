@@ -46,10 +46,11 @@ function TrainData(X::Matrix{Float64}, y::V) where {V <: AbstractArray{Bool ,1}}
     return TrainData(X, convert(Vector{Int}, y))
 end
 
-###############################################################################
-##### MCMC options type
-###############################################################################
+"""
+    Opts
 
+Options for the MCMC sampler.
+"""
 Base.@kwdef struct Opts
     nchains::Int = 4
     nburn::Int = 2500
