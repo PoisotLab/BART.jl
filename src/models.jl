@@ -50,15 +50,12 @@ end
 ##### MCMC options type
 ###############################################################################
 
-struct Opts
-    nchains::Int
-    nburn::Int
-    ndraw::Int
-    nthin::Int
-    S::Int64
-    function Opts(; nchains = 4, nburn = 2500, ndraw = 2500, nthin = 1)
-        return new(nchains, nburn, ndraw, nthin, nburn + ndraw)
-    end
+Base.@kwdef struct Opts
+    nchains::Int = 4
+    nburn::Int = 2500
+    ndraw::Int = 2500
+    nthin::Int = 1
+    S::Int64 = nburn + ndraw
 end
 
 ###############################################################################
