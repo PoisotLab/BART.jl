@@ -239,11 +239,22 @@ function deathbranch!(branch::Branch, tree::Tree)
     end
 end
 
+function _fastfindall(f, x)
+    idx = Vector{Int}(undef, length(x))
+    stop = 0
+    for i in Base.OneTo(length(x))
+        if f(x[i])
+            stop += 1
+            idx[stop] = i
+        end
+    end
+    return idx[1:stop]
+end
+
 ## Conduct a Death proposal
 function deathproposal!(bt::BartTree, rt::Vector{Float64}, bs::BartState, bm::BartModel)
     branch = rand(onlyparents(bt.tree))
-    indexes =
-        findall(x -> (x == branch.left) || (x == branch.right), leafnodes(bt.tree.root))
+    indexes = BART._fastfindall(x -> (x == branch.left) || (x == branch.right), leafnodes(bt.tree.root))
     S_prime = copy(bt.S)
     S_prime[:, indexes[1]] = sum(bt.S[:, indexes]; dims = 2)
     S_prime = S_prime[:, 1:end .!= indexes[2]]
@@ -293,15 +304,15 @@ end
 function drawμ!(bt::BartTree, rt::Vector{Float64}, bs::BartState, bm::BartModel)
     newμ = rand(MvNormal(bt.ss.Ω * bt.ss.rhat, Symmetric(bt.ss.Ω)))
     leaves = leafnodes(bt.tree.root)
-    for l in 1:length(leaves)
+    for l in eachindex(leaves)
         leaves[l].μ = newμ[l]
     end
 end
 
 ## Draw latent from truncated normal
 function drawz!(bs::BartState, bm::BartModel)
-    for i in 1:(bm.td.n)
-        if bm.td.y[i] == 1
+    for i in Base.OneTo(bm.td.n)
+        if isone(bm.td.y[i])
             bs.z[i] = rand(truncated(Normal(bs.fhat[i]), 0, Inf))
         else
             bs.z[i] = rand(truncated(Normal(bs.fhat[i]), -Inf, 0))
