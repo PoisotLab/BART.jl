@@ -1,28 +1,28 @@
 module BART
 
-  using Distributed
-  using Distributions
-  using LinearAlgebra
-  using MCMCChains
-  using StatsBase
-  using SpecialFunctions
+using Distributed
+using Distributions
+using LinearAlgebra
+using MCMCChains
+using StatsBase
+using SpecialFunctions
 
-  import DecisionTree
+import DecisionTree
 
-  include("trees.jl")
-  include("models.jl")
-  include("proposals.jl")
-  include("predict.jl")
-  include("fit.jl")
+include("trees.jl")
+include("models.jl")
+include("proposals.jl")
+include("predict.jl")
+include("fit.jl")
 
-  export
+export
     BartModel,
     Chains,
     Hypers,
     Opts,
     TrainData
 
-  export
+export
     depth,
     fit,
     ptd,

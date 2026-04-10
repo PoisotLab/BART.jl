@@ -3,35 +3,35 @@
 ###############################################################################
 
 function getμ(tree::Tree)
-  [leaf.μ for leaf in leafnodes(tree.root)]
+    return [leaf.μ for leaf in leafnodes(tree.root)]
 end
 
 function StatsBase.predict(bt::BartTree)
-  bt.S * getμ(bt.tree)
+    return bt.S * getμ(bt.tree)
 end
 
 function StatsBase.predict(bs::BartState, bm::BartModel)
-  fhat = zeros(bm.td.n)
-  for bt in bs.ensemble.trees
-    fhat += predict(bt)
-  end
-  fhat
+    fhat = zeros(bm.td.n)
+    for bt in bs.ensemble.trees
+        fhat += predict(bt)
+    end
+    return fhat
 end
 
 function StatsBase.predict(trees::Vector{Tree}, X::Matrix{Float64})
-  yhat = zeros(size(X, 1))
-  for tree in trees
-    yhat += leafprob(X, tree) * getμ(tree)
-  end
-  yhat
+    yhat = zeros(size(X, 1))
+    for tree in trees
+        yhat += leafprob(X, tree) * getμ(tree)
+    end
+    return yhat
 end
 
 function StatsBase.predict(bc::RegBartChain, X::Matrix{Float64})
-  treedraws = reshape(bc.treedraws, size(bc.treedraws, 1)*size(bc.treedraws, 3))
-  reduce(hcat, pmap(t -> predict(t, X), treedraws)) .+ bc.bm.td.ybar
+    treedraws = reshape(bc.treedraws, size(bc.treedraws, 1) * size(bc.treedraws, 3))
+    return reduce(hcat, pmap(t -> predict(t, X), treedraws)) .+ bc.bm.td.ybar
 end
 
 function StatsBase.predict(bc::ProbitBartChain, X::Matrix{Float64})
-  treedraws = reshape(bc.treedraws, size(bc.treedraws, 1)*size(bc.treedraws, 3))
-  reduce(hcat, pmap(t -> cdf.(Normal(), predict(t, X)), treedraws))
+    treedraws = reshape(bc.treedraws, size(bc.treedraws, 1) * size(bc.treedraws, 3))
+    return reduce(hcat, pmap(t -> cdf.(Normal(), predict(t, X)), treedraws))
 end
