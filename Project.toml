@@ -1,7 +1,7 @@
 name = "BART"
 uuid = "2063cdce-bfc1-11e9-3b8f-6d7934b498e2"
-authors = ["Brandon Butcher", "Timothée Poisot <timothee.poisot@umontreal.ca>"]
 version = "0.1.0"
+authors = ["Brandon Butcher", "Timothée Poisot <timothee.poisot@umontreal.ca>"]
 
 [deps]
 DecisionTree = "7806a523-6efd-50cb-b5f6-3fa6f1930dbb"
@@ -13,6 +13,13 @@ SpecialFunctions = "276daf66-3868-5448-9aa4-cd146d93841b"
 StatsBase = "2913bbd2-ae8a-5f71-8c99-4fb6c76f3a91"
 
 [compat]
+DecisionTree = "0.12"
+Distributed = "1"
+Distributions = "0.25"
+LinearAlgebra = "1"
+MCMCChains = "7.7"
+SpecialFunctions = "2.7"
+StatsBase = "0.34"
 julia = "1"
 
 [extras]
