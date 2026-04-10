@@ -143,8 +143,9 @@ end
 
 function suffstats(rt::Vector{Float64}, S::Matrix{Float64}, bs::BartState, bm::BartModel)
     Lt = size(S, 2)
-    Ω = inv(transpose(S) * S / bs.σ^2 + I / bm.hypers.τ)
-    rhat = transpose(S) * rt / bs.σ^2
+    tS = transpose(S)
+    Ω = inv(tS * S / bs.σ^2 + I / bm.hypers.τ)
+    rhat = tS * rt / bs.σ^2
     return SuffStats(Lt, Ω, rhat)
 end
 
