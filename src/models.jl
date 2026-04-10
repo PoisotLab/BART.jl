@@ -40,10 +40,10 @@ end
     TrainData(X::Matrix{Float64}, y::V) where {V <: AbstractArray{Bool ,1}}
 
 Generates the training data from a `BitVector` or `Vector{Bool}`, by turning the
-response into a floating point numbers array.
+response into an integer numbers array. This will be fit using probit BART.
 """
 function TrainData(X::Matrix{Float64}, y::V) where {V <: AbstractArray{Bool ,1}}
-    return TrainData(X, convert(Vector{Float64}, y))
+    return TrainData(X, convert(Vector{Int}, y))
 end
 
 ###############################################################################
@@ -84,18 +84,12 @@ struct Hypers
     shape::Float64
     a::Float64
     b::Float64
-    # group_idx::Vector{Int}
-    # groups::Vector{Int}
-    # group_size::Vector{Int}
-    # scale::Int
     function Hypers(td::TrainData; m = 50, k = 2,
         ν = 3.0, q = 0.9, α = 0.95, β = 2.0,
         sigma_noninf = true,
         hard = true, λmean = 0.1, λfix = false,
         init_trees = "leaf", init_depth = ones(4),
         sparse = false, shape = 1.0, a = 0.5, b = 1.0,
-        # ,
-        # group_idx = nothing
     )
         if !(init_trees in ["leaf", "rf"])
             throw(ArgumentError("init_tree options are leaf or rf"))
@@ -115,14 +109,8 @@ struct Hypers
             λfix = true
             λmean = 1 / 10000
         end
-        # group_idx = isa(group_idx, Nothing) ? collect(1:td.p) : group_idx
-        # groups = unique(group_idx)
-        # group_size = counts(group_idx)
-        # scale = length(group_size)
         return new(m, k, ν, δ, q, α, β, hard, λmean, λfix, sigma_noninf, τ,
             init_trees, init_depth, sparse, shape, a, b,
-            # ,
-            # group_idx, groups, group_size, scale
         )
     end
 end
