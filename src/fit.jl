@@ -10,7 +10,6 @@ function StatsBase.sample(bs::RegBartState, bm::BartModel)
         if bm.hypers.sparse
             draws!(bs, bm)
             drawα!(bs, bm)
-            # println(bs.shape)
         end
         if s > bm.opts.nburn
             posterior.sdraws[:, s - bm.opts.nburn] = exp.(bs.s)
@@ -18,7 +17,7 @@ function StatsBase.sample(bs::RegBartState, bm::BartModel)
             posterior.treedraws[s - bm.opts.nburn] =
                 [deepcopy(t.tree) for t in bs.ensemble.trees]
         end
-        if s % 100 == 0
+        if iszero(s % 100) & BART._VERBOSE
             println("MCMC iteration $s complete.")
         end
     end
@@ -37,7 +36,9 @@ function StatsBase.fit(
     init_trees =
         deepcopy(map(state -> Tree[bt.tree for bt in state.ensemble.trees], states))
     post = pmap(bs -> sample(bs, bm), states)
-    println("Processing chains...")
+    if BART._VERBOSE
+        println("Processing chains...")
+    end
     return RegBartChain(
         bm,
         init_trees,
@@ -131,14 +132,13 @@ function StatsBase.sample(bs::ProbitBartState, bm::BartModel)
         if bm.hypers.sparse
             draws!(bs, bm)
             drawα!(bs, bm)
-            # println(bs.shape)
         end
         if s > bm.opts.nburn
             posterior.sdraws[:, s - bm.opts.nburn] = exp.(bs.s)
             posterior.treedraws[s - bm.opts.nburn] =
                 [deepcopy(t.tree) for t in bs.ensemble.trees]
         end
-        if s % 100 == 0
+        if iszero(s % 100) & BART._VERBOSE
             println("MCMC iteration $s complete.")
         end
     end
@@ -157,7 +157,9 @@ function StatsBase.fit(
     init_trees =
         deepcopy(map(state -> Tree[bt.tree for bt in state.ensemble.trees], states))
     post = pmap(bs -> sample(bs, bm), states)
-    println("Processing chains...")
+     if BART._VERBOSE
+        println("Processing chains...")
+    end
     return ProbitBartChain(
         bm,
         init_trees,
@@ -260,7 +262,9 @@ function StatsBase.fit(BartModel, X::Matrix{Float64}, time::Vector{Float64},
     init_trees =
         deepcopy(map(state -> Tree[bt.tree for bt in state.ensemble.trees], states))
     post = pmap(bs -> sample(bs, bm), states)
-    println("Processing chains...")
+     if BART._VERBOSE
+        println("Processing chains...")
+    end
     treedraws = reduce(hcat, pmap(p -> p.treedraws, post))
     pdraws = reduce(hcat, pmap(t -> cdf.(Normal(), predict(t, bm.td.X)), treedraws))
     ut = sort(unique(time))

@@ -417,7 +417,6 @@ function drawα!(bs::BartState, bm::BartModel)
     new_ω = sample(grid, weights(prob))
     return bs.shape = (new_ω / (1 - new_ω)) * bm.td.p
     # bs.shape = bm.hypers.shape
-    # println(bs.shape)
 end
 
 ## Log tree posterior: continuous respose

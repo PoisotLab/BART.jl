@@ -9,6 +9,8 @@ using SpecialFunctions
 
 import DecisionTree
 
+const _VERBOSE = true
+
 include("trees.jl")
 include("models.jl")
 include("proposals.jl")
