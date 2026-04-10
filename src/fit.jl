@@ -148,6 +148,16 @@ end
 function StatsBase.fit(
     BartModel,
     X::Matrix{Float64},
+    y::V,
+    args...;
+    kwargs...,
+) where {V <: AbstractArray{Bool, 1}}
+return StatsBase.fit(BartModel, X, convert(Vector{Int}, y), args...; kwargs...)
+end
+
+function StatsBase.fit(
+    BartModel,
+    X::Matrix{Float64},
     y::Vector{Int},
     opts = Opts();
     hyperags...,
