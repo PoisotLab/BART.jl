@@ -247,7 +247,8 @@ function _fastfindall(f, x)
             idx[stop] = i
         end
     end
-    return idx[1:stop]
+    resize!(idx, stop)
+    return stop
 end
 
 ## Conduct a Death proposal
