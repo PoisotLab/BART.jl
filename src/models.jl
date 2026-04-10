@@ -7,7 +7,6 @@ struct TrainData
     p::Int
     xmin::Matrix{Float64}
     xmax::Matrix{Float64}
-    # dt::ZScoreTransform{Float64}
     X::Matrix{Float64}
     ybar::Float64
     y::AbstractVector
@@ -23,9 +22,6 @@ function TrainData(X::Matrix{Float64}, y::Vector{Float64})
     yhat = Q * Q' * y
     r = y - yhat
     σhat = p >= n ? std(y) : sqrt(dot(r, r) / (n - p))
-    # dt = fit(ZScoreTransform, transpose(X))
-    # X = StatsBase.transform(dt, transpose(X))
-    # X = Matrix(transpose(X))
     xmin = minimum(X; dims = 1)
     xmax = maximum(X; dims = 1)
     return TrainData(n, p, xmin, xmax, X, ybar, y, σhat)
@@ -34,13 +30,20 @@ end
 function TrainData(X::Matrix{Float64}, y::Vector{Int})
     n = length(y)
     p = size(X, 2)
-    # dt = fit(ZScoreTransform, transpose(X))
-    # X = StatsBase.transform(dt, transpose(X))
-    # X = Matrix(transpose(X))
     xmin = minimum(X; dims = 1)
     xmax = maximum(X; dims = 1)
     ybar = mean(y)
     return TrainData(n, p, xmin, xmax, X, ybar, y, 1.0)
+end
+
+"""
+    TrainData(X::Matrix{Float64}, y::V) where {V <: AbstractArray{Bool ,1}}
+
+Generates the training data from a `BitVector` or `Vector{Bool}`, by turning the
+response into a floating point numbers array.
+"""
+function TrainData(X::Matrix{Float64}, y::V) where {V <: AbstractArray{Bool ,1}}
+    return TrainData(X, convert(Vector{Float64}, y))
 end
 
 ###############################################################################
