@@ -40,11 +40,11 @@ end
 
 ## Probability that an observtion goes left at a given Branch
 function probleft(x::Vector{Float64}, branch::Branch, tree::Tree)
-    return 1 / (1 + exp((x[branch.var] - branch.cut) / tree.λ))
+    return 1.0 / (1.0 + exp((x[branch.var] - branch.cut) / tree.λ))
 end
 
 function probleft(X::Matrix{Float64}, branch::Branch, tree::Tree)
-    return 1 ./ (1 .+ exp.((X[:, branch.var] .- branch.cut) ./ tree.λ))
+    return 1.0 ./ (1.0 .+ exp.((X[:, branch.var] .- branch.cut) ./ tree.λ))
 end
 
 ## Probability that observations end up in each Leaf
@@ -191,7 +191,7 @@ function birthproposal!(bt::BartTree, rt::Vector{Float64}, bs::BartState, bm::Ba
     branch = Branch(newvar, newcut, Leaf(0.0), Leaf(0.0))
     goesleft = bt.S[:, index] .* probleft(bm.td.X, branch, bt.tree)
     goesright = bt.S[:, index] .- goesleft
-    if size(bt.S, 2) == 1
+    if isone(size(bt.S, 2))
         S_prime = hcat(goesleft, goesright)
     else
         indices = [index, index + 1]
@@ -351,7 +351,7 @@ function drawσ!(bs::RegBartState, bm::BartModel)
 end
 
 ## Draw sparsity per Linero & Yang (2018)
-varcount!(leaf::Leaf, counts::Vector) = nothing
+varcount!(::Leaf, ::Vector) = nothing
 
 function varcount!(branch::Branch, counts::Vector)
     counts[branch.var] += 1
