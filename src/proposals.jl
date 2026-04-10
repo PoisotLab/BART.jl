@@ -54,9 +54,8 @@ function leafprob(x::Vector{Float64}, tree::Tree)
     end
     S = Float64[]
     goesleft = probleft(x, tree.root, tree)
-    goesright = 1 - goesleft
     leafprob(x, tree.root.left, tree, goesleft, S)
-    return leafprob(x, tree.root.right, tree, goesright, S)
+    return leafprob(x, tree.root.right, tree, 1.0 - goesleft, S)
 end
 
 function leafprob(
@@ -104,11 +103,11 @@ function drawcut(leaf::Leaf, var::Int64, tree::Tree, bm::BartModel)
     branch = leaf
     lower = [bm.td.xmin[:, var][1]]
     upper = [bm.td.xmax[:, var][1]]
-    check = branch == tree.root ? false : true
+    check = branch != tree.root
     while check
         left = isleft(branch, tree)
         branch = parent(branch, tree)
-        check = branch == tree.root ? false : true
+        check = branch != tree.root
         if (branch.var == var)
             check
             if (left)
